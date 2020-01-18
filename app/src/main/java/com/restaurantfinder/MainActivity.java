@@ -47,16 +47,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView(){
-        addButton = (Button) findViewById(R.id.my_recycler_view);
+        addButton = (Button) findViewById(R.id.add_button);
         recyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
 
     }
 
     private void initRecycle(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         myDatas = initData();
         myAdapter = new MyAdapter(MainActivity.this,myDatas);
         recyclerView.setAdapter(myAdapter);
+
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
     }

@@ -11,9 +11,8 @@
         android:text="1" />
     <Button
         android:id="@+id/tv_delete"
-        android:layout_width="50dp"
+        android:layout_width="100dp"
         android:layout_height="50dp"
-        android:gravity="right"
-        android:text="2"
+        android:text="delete"
         android:layout_marginRight="20dp"/>
 </RelativeLayout>
