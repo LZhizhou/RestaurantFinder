@@ -136,14 +136,14 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
 
                 if (route != null) {
                     int transfer = 0;
-                    builder.append(" ").append(route.getLegs().get(0).getDuration().getText()).append(",");
-                    for (Step step : route.getLegs().get(0).getSteps()) {
-                        if ("TRANSIT".equals(step.getTravelMode())) {
-                            transfer += 1;
-
-                        }
-                    }
-                    builder.append(" ").append(transfer).append(" buses;");
+                    builder.append(" ").append(route.getLegs().get(0).getDuration().getText()).append(";");
+//                    for (Step step : route.getLegs().get(0).getSteps()) {
+//                        if ("TRANSIT".equals(step.getTravelMode())) {
+//                            transfer += 1;
+//
+//                        }
+//                    }
+//                    builder.append(" ").append(transfer).append(" buses;");
                 } else {
                     builder.append(" ").append("cannot go to there by public transportation;");
                 }
