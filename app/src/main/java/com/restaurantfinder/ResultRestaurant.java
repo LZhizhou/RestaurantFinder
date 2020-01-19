@@ -128,7 +128,7 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
             holder.ratingBar.setRating((float) rate);
         }
 
-        StringBuilder builder = new StringBuilder().append("Time needed by public transportation:");
+        StringBuilder builder = new StringBuilder().append("Time needed:");
         if (ORIGINAL.size() > 0) {
             for (PlaceWithLatLonAndAddress it : ORIGINAL) {
 //                RequestSingleton.getInstance(context).addToRequestQueue(getRouteRequest(it,item));

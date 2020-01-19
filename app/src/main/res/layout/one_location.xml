@@ -2,7 +2,10 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/default_gap">
+    android:layout_marginLeft="2sp"
+    android:layout_marginTop="4dp"
+    android:layout_marginRight="2sp"
+    android:layout_marginBottom="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,14 +15,16 @@
         <TextView
             android:id="@+id/location_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:singleLine="true"
             android:layout_weight="1" />
 
         <ImageButton
-
             android:id="@+id/delete_location"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="26dp"
+            android:layout_height="30dp"
             android:src="@drawable/quantum_ic_clear_grey600_24" />
 
     </LinearLayout>
