@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
@@ -52,10 +53,21 @@ public class ResultRestaurant extends AppCompatActivity {
         allRestaurantRecycle.setLayoutManager(new GridLayoutManager(ResultRestaurant.this, 2));
         RestaurantAdapter restaurantAdapter = new RestaurantAdapter(this);
         allRestaurantRecycle.setAdapter(restaurantAdapter);
-
     }
 
 
+    public void randomSelect(View view) {
+
+        int ranInt = new Random().nextInt(RestaurantAdapter.RESTAURANT_LIST.size());
+        Result item = RestaurantAdapter.RESTAURANT_LIST.get(ranInt);
+        Uri gmmUri = Uri.parse("geo:" + item.getGeometry().getLocation().getLat() + "," + item.getGeometry().getLocation().getLng() +
+                "?q=" + item.getName() + "," + item.getVicinity());
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, gmmUri);
+        intent.setPackage("com.google.android.apps.maps");
+        startActivity(intent);
+
+    }
 }
 
 
