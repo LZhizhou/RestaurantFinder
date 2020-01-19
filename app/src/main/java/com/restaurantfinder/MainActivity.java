@@ -1,7 +1,9 @@
 package com.restaurantfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -10,8 +12,17 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class MainActivity extends AppCompatActivity {
     public final static int START_MAP = 0x07;
@@ -56,11 +67,35 @@ public class MainActivity extends AppCompatActivity {
 
             Bundle bundle = data != null ? data.getExtras() : null;
             if (bundle != null) {
-                allLocations.add(new PlaceWIthLatLonAndAddress(bundle.getDouble("Lat"), bundle.getDouble("Lon"), bundle.getString("Address")));
+                PlaceWIthLatLonAndAddress place = new PlaceWIthLatLonAndAddress(bundle.getDouble("Lat"), bundle.getDouble("Lon"), bundle.getString("Address"));
+                allLocations.add(place);
                 locationAdapter.notifyItemRangeChanged(0, allLocations.size());
+                RequestSingleton.getInstance(this).addToRequestQueue(request(getUrl(place)));
             }
 
         }
 
+    }
+
+    private String getUrl(PlaceWIthLatLonAndAddress location){
+        StringBuilder stringBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        stringBuilder.append("location=").append(location.lat).append(",").append(location.lon);
+        stringBuilder.append("&radius=").append(150);
+        stringBuilder.append("&types=").append("restaurant");
+        stringBuilder.append("&key=" + getString(R.string.google_maps_key));
+        return  stringBuilder.toString();
+    }
+    private  JsonObjectRequest request(String url){
+        return new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i(TAG, "onResponse: " + response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "onErrorResponse: ", error);
+            }
+        });
     }
 }
