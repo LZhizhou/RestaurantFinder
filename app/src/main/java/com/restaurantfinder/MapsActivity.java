@@ -1,12 +1,16 @@
 package com.restaurantfinder;
 
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -29,11 +33,15 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMapClickListener {
 
     private static final String TAG = "onMap";
     private static final int DEFAULT_ZOOM = 15;
@@ -41,13 +49,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean mLocationPermissionGranted;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0x0011;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-//    private GeoDataClient mGeoDataClient;
-//    private PlaceDetectionClient mPlaceDetectionClient;
     private Location mLastKnownLocation;
-    private LatLng resLocation;
+    private PlaceWIthLatLonAndAddress resLocation;
     private LatLng mDefaultLocation;
     private Marker mapMaker;
-    private FloatingActionButton myLocation;
+    private AutocompleteSupportFragment autoSearch;
+    private Geocoder geocoder;
+    private View mapView;
 
 
 
@@ -59,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(),getString(R.string.google_maps_key));
         }
+        geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
 
 
         // Construct a FusedLocationProviderClient.
@@ -73,13 +82,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autoSearch = (AutocompleteSupportFragment)
+        autoSearch = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.location_auto_search);
 
-        initClick();
-
-
-
+        mapView = mapFragment.getView();
 
 
 // Set up a PlaceSelectionListener to handle the response.
@@ -96,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(res, DEFAULT_ZOOM));
                     if (res != null) {
                         mapMaker.setPosition(res);
-                        resLocation = res;
+                        resLocation = new PlaceWIthLatLonAndAddress(res, place.getName());
                     }
 
                     //Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
@@ -111,18 +117,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             });
         }
-    }
-
-    private void initClick() {
-        myLocation = findViewById(R.id.goto_my_location);
-        myLocation.setOnClickListener(new View.OnClickListener() {
+        MaterialButton confirmButton = findViewById(R.id.confirm_button);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                getDeviceLocation();
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putDouble("Lat", resLocation.lat);
+                bundle.putDouble("Lon", resLocation.lon);
+                bundle.putString("Address", resLocation.address);
+                intent.putExtras(bundle);
+                setResult(MainActivity.RETURN_FROM_MAP, intent);
+                finish();
             }
         });
-
     }
+
 
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -148,21 +158,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-
-                LatLng center = mMap.getCameraPosition().target;
-                if (mapMaker==null){
-                    mapMaker = mMap.addMarker(new MarkerOptions().position(center));
-                }
-                else{
-                    mapMaker.setPosition(center);
-                }
-                resLocation = center;
-
-            }
-        });
 
 /*        // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
@@ -171,10 +166,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
         getDeviceLocation();
 
+
+        mMap.setOnMyLocationButtonClickListener(this);
+
+        mMap.setOnMapClickListener(this);
+
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
+
+        if (mapView != null &&
+                mapView.findViewById(Integer.parseInt("1")) != null) {
+            // Get the button view
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            // and next place it, on bottom right (as Google Maps app)
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    locationButton.getLayoutParams();
+            // position on right bottom
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 30, 30);
+        }
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
+                                           @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
         switch (requestCode) {
@@ -219,13 +235,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             LatLng currentLocation;
+
                             if (mLastKnownLocation==null){
                                 currentLocation= mDefaultLocation;
                             }else{
-                                currentLocation = new LatLng(mLastKnownLocation.getLatitude(),
-                                        mLastKnownLocation.getLongitude());
+                                currentLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             }
-
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     currentLocation, DEFAULT_ZOOM));
                             if (mapMaker==null){
@@ -234,13 +249,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             else{
                                 mapMaker.setPosition(currentLocation);
                             }
-                            resLocation = currentLocation;
+                            resLocation = new PlaceWIthLatLonAndAddress(currentLocation, getAddressFromLatLon(currentLocation));
 /*                            Intent intent = new Intent();
                             Bundle bundle = new Bundle();
                             bundle.putDouble("Latitude", mLastKnownLocation.getLatitude());
                             bundle.putDouble("Longitude", mLastKnownLocation.getLongitude());
                             intent.putExtras(bundle);
-                            setResult(0x10, intent);//返回值调用函数，返回值的标志*/
+                            setResult(0x10, intent);*/
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -255,5 +270,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
+    }
 
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if (mapMaker == null) {
+            mapMaker = mMap.addMarker(new MarkerOptions().position(latLng));
+        } else {
+            mapMaker.setPosition(latLng);
+
+
+        }
+        String address = getAddressFromLatLon(latLng);
+        autoSearch.setText(address);
+        resLocation = new PlaceWIthLatLonAndAddress(latLng, address);
+    }
+
+    private String getAddressFromLatLon(LatLng latLng) {
+        List<Address> addresses = null;
+        String errorMessage = "";
+        StringBuilder builder = new StringBuilder();
+        try {
+            addresses = geocoder.getFromLocation(
+                    latLng.latitude,
+                    latLng.longitude, 1);
+        } catch (IOException ioException) {
+            // Catch network or other I/O problems.
+            //errorMessage = getString(R.string.service_not_available);
+            Log.e(TAG, errorMessage, ioException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // Catch invalid latitude or longitude values.
+            //errorMessage = getString(R.string.invalid_lat_long_used);
+            Log.e(TAG, errorMessage + ". " +
+                    "Latitude = " + latLng.latitude +
+                    ", Longitude = " +
+                    latLng.longitude, illegalArgumentException);
+        }
+        if (addresses != null && addresses.size() > 0) {
+
+            Address address = addresses.get(0);
+
+
+//                        ArrayList<String> addressFragments = new ArrayList<String>();
+
+            // Fetch the address lines using getAddressLine,
+            // join them, and send them to the thread.
+//                        for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+//                            addressFragments.add(address.getAddressLine(i));
+//                        }
+            for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                builder.append(address.getAddressLine(i));
+            }
+            Log.i(TAG, "onClickMap: " + builder.toString());
+
+        }
+        return builder.toString();
+    }
 }

@@ -3,9 +3,8 @@ package com.restaurantfinder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private List<String> myDatas = new ArrayList<String>();
-    private MyAdapter myAdapter;
-    private Button addButton;
-
+    public final static int START_MAP = 0x07;
+    public final static int RETURN_FROM_MAP = 0x08;
+    private RecyclerView locationRecycleView;
+    private List<PlaceWIthLatLonAndAddress> allLocations = new ArrayList<>();
+    private LocationAdapter locationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,37 +28,39 @@ public class MainActivity extends AppCompatActivity {
 //        startActivity(intent);
         initView();
         initRecycle();
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                myAdapter.addItem(myDatas.size());
-            }
-        });
-    }
-
-    protected ArrayList<String> initData(){
-        ArrayList<String> myDatas = new ArrayList<String>();
-        for(int i=0;i<1;i++){
-            myDatas.add("this is person"+ (i+1));
-        }
-        return myDatas;
-
     }
 
     private void initView(){
-        addButton = (Button) findViewById(R.id.add_button);
-        recyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
+        locationRecycleView = findViewById(R.id.all_location_recycle);
 
     }
 
     private void initRecycle(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        myDatas = initData();
-        myAdapter = new MyAdapter(MainActivity.this,myDatas);
-        recyclerView.setAdapter(myAdapter);
+        locationRecycleView.setLayoutManager(new LinearLayoutManager(this));
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        locationAdapter = new LocationAdapter(MainActivity.this, allLocations, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivityForResult(intent, START_MAP);
+            }
+        });
+        locationRecycleView.setAdapter(locationAdapter);
+        locationRecycleView.setItemAnimator(new DefaultItemAnimator());
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == START_MAP && resultCode == RETURN_FROM_MAP) {
+
+            Bundle bundle = data != null ? data.getExtras() : null;
+            if (bundle != null) {
+                allLocations.add(new PlaceWIthLatLonAndAddress(bundle.getDouble("Lat"), bundle.getDouble("Lon"), bundle.getString("Address")));
+                locationAdapter.notifyItemRangeChanged(0, allLocations.size());
+            }
+
+        }
 
     }
 }

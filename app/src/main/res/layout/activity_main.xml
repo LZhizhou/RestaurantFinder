@@ -4,17 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
+        android:id="@+id/all_location_recycle"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="200dp"/>
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:id="@+id/add_button"
-        android:text="add">
-
-    </Button>
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>
