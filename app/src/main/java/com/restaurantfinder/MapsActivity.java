@@ -2,11 +2,15 @@ package com.restaurantfinder;
 
 
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -31,9 +35,14 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationClickListener{
 
     private static final String TAG = "onMap";
     private static final int DEFAULT_ZOOM = 15;
@@ -48,6 +57,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng mDefaultLocation;
     private Marker mapMaker;
     private FloatingActionButton myLocation;
+    private AutocompleteSupportFragment autoSearch;
+
+    View mapView;
 
 
 
@@ -73,13 +85,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autoSearch = (AutocompleteSupportFragment)
+        autoSearch = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.location_auto_search);
 
-        initClick();
+//        initClick();
 
 
-
+        mapView = mapFragment.getView();
 
 
 // Set up a PlaceSelectionListener to handle the response.
@@ -113,16 +125,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void initClick() {
-        myLocation = findViewById(R.id.goto_my_location);
-        myLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDeviceLocation();
-            }
-        });
-
-    }
+//    private void initClick() {
+//        myLocation = findViewById(R.id.goto_my_location);
+//        myLocation.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getDeviceLocation();
+//            }
+//        });
+//
+//    }
 
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -158,6 +170,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 else{
                     mapMaker.setPosition(center);
+
+                    Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+
+                    List<Address> addresses = null;
+                    String errorMessage = "";
+
+                    try {
+                        addresses = geocoder.getFromLocation(
+                                center.latitude,
+                                center.longitude, 1);
+                    } catch (IOException ioException) {
+                        // Catch network or other I/O problems.
+                        //errorMessage = getString(R.string.service_not_available);
+                        Log.e(TAG, errorMessage, ioException);
+                    } catch (IllegalArgumentException illegalArgumentException) {
+                        // Catch invalid latitude or longitude values.
+                        //errorMessage = getString(R.string.invalid_lat_long_used);
+                        Log.e(TAG, errorMessage + ". " +
+                                "Latitude = " + center.latitude +
+                                ", Longitude = " +
+                                center.longitude, illegalArgumentException);
+                    }
+
+
+                    if (addresses == null || addresses.size()  == 0) {
+                    } else {
+                        Address address = addresses.get(0);
+                        ArrayList<String> addressFragments = new ArrayList<String>();
+
+                        // Fetch the address lines using getAddressLine,
+                        // join them, and send them to the thread.
+                        for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                            addressFragments.add(address.getAddressLine(i));
+                        }
+                        Log.i(TAG, "onCameraMove: "+ addressFragments.toString());
+                        autoSearch.setText(addressFragments.get(0));
+                    }
+
+
+
                 }
                 resLocation = center;
 
@@ -170,6 +222,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
         updateLocationUI();
         getDeviceLocation();
+
+
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
+
+        if (mapView != null &&
+                mapView.findViewById(Integer.parseInt("1")) != null) {
+            // Get the button view
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            // and next place it, on bottom right (as Google Maps app)
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    locationButton.getLayoutParams();
+            // position on right bottom
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 30, 30);
+        }
 
     }
     @Override
@@ -253,6 +325,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch(SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+
+
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
     }
 
 
