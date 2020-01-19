@@ -27,7 +27,6 @@ import com.google.gson.JsonParser;
 import com.restaurantfinder.model.Result;
 import com.restaurantfinder.model.Route;
 import com.restaurantfinder.model.RouteReceived;
-import com.restaurantfinder.model.Step;
 
 import org.json.JSONObject;
 
@@ -121,17 +120,8 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
             for (PlaceWithLatLonAndAddress it : ORIGINAL) {
 //                RequestSingleton.getInstance(context).addToRequestQueue(getRouteRequest(it,item));
                 Route route = ROUTE_MATRIX.get(Pair.create(it, item));
-
                 if (route != null) {
-                    int transfer = 0;
-                    builder.append(" ").append(route.getLegs().get(0).getDuration().getText()).append(",");
-                    for (Step step : route.getLegs().get(0).getSteps()) {
-                        if ("TRANSIT".equals(step.getTravelMode())) {
-                            transfer += 1;
-
-                        }
-                    }
-                    builder.append(" ").append(transfer).append(" buses;");
+                    builder.append(" ").append(route.getLegs().get(0).getDuration().getText()).append(";");
                 } else {
                     builder.append(" ").append("cannot go to there by public transportation;");
                 }
@@ -140,7 +130,6 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
         }
 
     }
-
 
 
     @Override
@@ -173,7 +162,32 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
                 requestCount++;
                 if (requestCount == ORIGINAL.size() * RESTAURANT_LIST.size()) {
 
-                    transferSort();
+                    Collections.sort(RestaurantAdapter.RESTAURANT_LIST, new Comparator<Result>() {
+                        @Override
+                        public int compare(Result o1, Result o2) {
+                            int sum1 = 0, sum2 = 0, notGo1 = 0, notGo2 = 0;
+                            for (PlaceWithLatLonAndAddress it : RestaurantAdapter.ORIGINAL) {
+                                Route route1 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o1));
+                                Route route2 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o2));
+                                if (route1 == null) {
+                                    notGo1++;
+                                } else {
+                                    sum1 += route1.getLegs().get(0).getDuration().getValue();
+                                }
+                                if (route2 == null) {
+                                    notGo2++;
+                                } else {
+                                    sum2 += route2.getLegs().get(0).getDuration().getValue();
+                                }
+
+                            }
+                            if (notGo1 != notGo2) {
+                                return notGo1 - notGo2;
+                            } else {
+                                return sum1 - sum2;
+                            }
+                        }
+                    });
                     notifyItemRangeChanged(0, requestCount);
                 }
                 Log.i(TAG, "onRouteResponse: " + response.toString());
@@ -182,76 +196,6 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "onErrorResponse: ", error);
-            }
-        });
-    }
-
-    private void transferSort() {
-        Collections.sort(RestaurantAdapter.RESTAURANT_LIST, new Comparator<Result>() {
-            @Override
-            public int compare(Result o1, Result o2) {
-                int transfer1 = 0, transfer2 = 0, notGo1 = 0, notGo2 = 0, sum1 = 0, sum2 = 0;
-                for (PlaceWithLatLonAndAddress it : RestaurantAdapter.ORIGINAL) {
-                    Route route1 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o1));
-                    Route route2 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o2));
-                    if (route1 == null) {
-                        notGo1++;
-                    } else {
-                        sum1 += route1.getLegs().get(0).getDuration().getValue();
-                        for (Step step : route1.getLegs().get(0).getSteps()) {
-                            if ("TRANSIT".equals(step.getTravelMode())) {
-                                transfer1 += 1;
-                            }
-                        }
-                    }
-                    if (route2 == null) {
-                        notGo2++;
-                    } else {
-                        sum2 += route2.getLegs().get(0).getDuration().getValue();
-                        for (Step step : route2.getLegs().get(0).getSteps()) {
-                            if ("TRANSIT".equals(step.getTravelMode())) {
-                                transfer2 += 1;
-                            }
-                        }
-                    }
-
-                }
-                if (notGo1 != notGo2) {
-                    return notGo1 - notGo2;
-                } else if (transfer1 != transfer2) {
-                    return transfer1 - transfer2;
-                } else {
-                    return sum1 - sum2;
-                }
-            }
-        });
-    }
-
-    private void timeSort() {
-        Collections.sort(RestaurantAdapter.RESTAURANT_LIST, new Comparator<Result>() {
-            @Override
-            public int compare(Result o1, Result o2) {
-                int sum1 = 0, sum2 = 0, notGo1 = 0, notGo2 = 0;
-                for (PlaceWithLatLonAndAddress it : RestaurantAdapter.ORIGINAL) {
-                    Route route1 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o1));
-                    Route route2 = RestaurantAdapter.ROUTE_MATRIX.get(Pair.create(it, o2));
-                    if (route1 == null) {
-                        notGo1++;
-                    } else {
-                        sum1 += route1.getLegs().get(0).getDuration().getValue();
-                    }
-                    if (route2 == null) {
-                        notGo2++;
-                    } else {
-                        sum2 += route2.getLegs().get(0).getDuration().getValue();
-                    }
-
-                }
-                if (notGo1 != notGo2) {
-                    return notGo1 - notGo2;
-                } else {
-                    return sum1 - sum2;
-                }
             }
         });
     }
@@ -271,5 +215,4 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
             duration = itemView.findViewById(R.id.duration);
         }
     }
-
 }

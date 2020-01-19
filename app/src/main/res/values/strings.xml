@@ -2,4 +2,35 @@
     <string name="app_name">Restaurant Finder</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_map_detail">Map</string>
+
+    <string name="Hours_open_now">Open Now</string>
+    <string name="Hours_any_time">Any Time</string>
+    <string name="Hours">Hours</string>
+    <string name="Cuisine">Cuisine</string>
+    <string name="Cuisine_chinese">Chinese</string>
+    <string name="Cuisine_french">French</string>
+    <string name="Cuisine_hamburger">Hamburger</string>
+    <string name="Cuisine_indian">Indian</string>
+    <string name="Cuisine_italian">Italian</string>
+    <string name="Cuisine_japanese">Japanese</string>
+    <string name="Cuisine_middle_eastern">Middle Eastern</string>
+    <string name="Cuisine_maxican">Maxican</string>
+    <string name="Cuisine_pizza">Pizza</string>
+    <string name="Cuisine_seafood">Seafood</string>
+    <string name="Cuisine_select_all">Select All</string>
+    <string name="Cuisine_sushi">Sushi</string>
+    <string name="Cuisine_thai">Thai</string>
+    <string name="Cuisine_vietnamese">Vietnamese</string>
+    <string name="Mode">Preferred Mode</string>
+    <string name="Mode_bus">Bus</string>
+    <string name="Mode_subway">Subway</string>
+    <string name="Mode_train">Train</string>
+    <string name="Mode_tram_light_rail">Tram and Light Rail</string>
+    <string name="Route">Routes</string>
+    <string name="Route_best">Best Route</string>
+    <string name="Route_fewer_transfers">Fewer Transfers</string>
+    <string name="Route_less_walking">Less Walking</string>
+    <string name="Route_wheelchair">Wheelchair Accessible</string>
+    <string name="Search">Search</string>
+
 </resources>
