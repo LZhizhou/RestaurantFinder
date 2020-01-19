@@ -63,10 +63,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        getLocationPermission();
         // Initialize Places.
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(),getString(R.string.google_maps_key));
         }
+
         geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
 
 
@@ -74,12 +76,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         mDefaultLocation =new LatLng(-34, 151);
 
-        getLocationPermission();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
+
 
         // Initialize the AutocompleteSupportFragment.
         autoSearch = (AutocompleteSupportFragment)
@@ -144,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+
     }
 
     /**
@@ -199,6 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                    getDeviceLocation();
                 }
             }
         }
@@ -215,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
-                getLocationPermission();
+
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());

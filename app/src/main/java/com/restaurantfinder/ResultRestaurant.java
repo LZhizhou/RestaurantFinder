@@ -1,9 +1,12 @@
 package com.restaurantfinder;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,13 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.material.button.MaterialButton;
+import com.restaurantfinder.model.Result;
 
 import java.util.ArrayList;
 
 public class ResultRestaurant extends AppCompatActivity {
-    private static ArrayList<Place> RESTAURANTS = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,19 +28,21 @@ public class ResultRestaurant extends AppCompatActivity {
         RecyclerView allRestaurantRecycle = findViewById(R.id.all_restaurant_recycle);
         allRestaurantRecycle.setHasFixedSize(true);
         allRestaurantRecycle.setLayoutManager(new LinearLayoutManager(this));
-        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(RESTAURANTS);
+        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(this);
         allRestaurantRecycle.setAdapter(restaurantAdapter);
 
     }
+
 
 }
 
 
 class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolder> {
-    private ArrayList<Place> restaurantList;
+    public static ArrayList<Result> RESTAURANT_LIST;
+    private Context context;
 
-    public RestaurantAdapter(ArrayList<Place> restaurantList) {
-        this.restaurantList = restaurantList;
+    public RestaurantAdapter(Context context) {
+        this.context = context;
     }
 
     @NonNull
@@ -50,29 +53,38 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.nameText.setText(restaurantList.get(position).getName());
+        final Result item = RESTAURANT_LIST.get(position);
+        holder.nameText.setText(item.getName());
         holder.clearItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                restaurantList.remove(position);
+                int idx = RESTAURANT_LIST.indexOf(item);
+                RESTAURANT_LIST.remove(item);
+                notifyItemRemoved(idx);
+
             }
         });
+        double rate = RESTAURANT_LIST.get(position).getRating();
+        if (rate != 0) {
+            holder.ratingBar.setRating((float) rate);
+        }
 
     }
 
     @Override
     public int getItemCount() {
-        return restaurantList.size();
+        return RESTAURANT_LIST.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameText;
-        MaterialButton clearItem;
-
+        ImageButton clearItem;
+        RatingBar ratingBar;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.restaurant_name);
             clearItem = itemView.findViewById(R.id.clear_item);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 }
