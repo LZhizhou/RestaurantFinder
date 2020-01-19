@@ -14,10 +14,10 @@ import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     private Context context;
-    private List<PlaceWIthLatLonAndAddress> locationList;
+    private List<PlaceWithLatLonAndAddress> locationList;
     private View.OnClickListener onClickListener;
 
-    public LocationAdapter(Context context, List<PlaceWIthLatLonAndAddress> locationList, View.OnClickListener onClickListener) {
+    public LocationAdapter(Context context, List<PlaceWithLatLonAndAddress> locationList, View.OnClickListener onClickListener) {
         this.context = context;
         this.locationList = locationList;
         this.onClickListener = onClickListener;

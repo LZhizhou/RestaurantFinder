@@ -24,16 +24,16 @@ import com.restaurantfinder.model.Result;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
+import static com.restaurantfinder.RestaurantAdapter.ORIGINAL;
 import static com.restaurantfinder.RestaurantAdapter.RESTAURANT_LIST;
 
 public class MainActivity extends AppCompatActivity {
     public final static int START_MAP = 0x07;
     public final static int RETURN_FROM_MAP = 0x08;
     private RecyclerView locationRecycleView;
-    private List<PlaceWIthLatLonAndAddress> allLocations = new ArrayList<>();
+    private ArrayList<PlaceWithLatLonAndAddress> allLocations = new ArrayList<>();
     private LocationAdapter locationAdapter;
     //    private ArrayList<List<Result>> resultsList;
     private int queueCount = 0;
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
             Bundle bundle = data != null ? data.getExtras() : null;
             if (bundle != null) {
-                PlaceWIthLatLonAndAddress place = new PlaceWIthLatLonAndAddress(bundle.getDouble("Lat"), bundle.getDouble("Lon"), bundle.getString("Address"));
+                PlaceWithLatLonAndAddress place = new PlaceWithLatLonAndAddress(bundle.getDouble("Lat"), bundle.getDouble("Lon"), bundle.getString("Address"));
                 allLocations.add(place);
                 locationAdapter.notifyItemRangeChanged(0, allLocations.size());
 
@@ -88,18 +88,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private String getUrl(PlaceWIthLatLonAndAddress location){
+    private String getFindRestaurantUrl(PlaceWithLatLonAndAddress location) {
         return "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "location=" + location.lat + "," + location.lon +
                 "&radius=" + 5000 +
                 "&types=" + "restaurant" +
                 "&key=" + getString(R.string.google_maps_key);
     }
-    private  JsonObjectRequest request(String url){
-        return new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+    private JsonObjectRequest findRestaurantRequest(final PlaceWithLatLonAndAddress location) {
+        return new JsonObjectRequest(Request.Method.GET, getFindRestaurantUrl(location), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 ReceivedPack receivedPack = new Gson().fromJson(new JsonParser().parse(response.toString()), ReceivedPack.class);
                 for (Result it : receivedPack.getResults()) {
+//                    RequestSingleton.getInstance(MainActivity.this).addToRequestQueue(getRouteRequest(location,it));
                     if (!RESTAURANT_LIST.contains(it)) {
                         RESTAURANT_LIST.add(it);
                     }
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ResultRestaurant.class);
                     startActivity(intent);
                 }
-                Log.i(TAG, "onResponse: " + response.toString());
+                Log.i(TAG, "onRestaurantResponse: " + response.toString());
             }
         }, new Response.ErrorListener() {
             @Override
@@ -119,14 +121,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+//    private String getRouteUrl(PlaceWithLatLonAndAddress origin, Result dest){
+//        return "https://maps.googleapis.com/maps/api/directions/json?" + "origin=" + origin.lat + "," + origin.lon +
+//                "&destination=" + dest.getGeometry().getLocation().getLat() +","+dest.getGeometry().getLocation().getLng()+
+//                "&mode="+"transit"+
+//                "&key=" + getString(R.string.google_maps_key);
+//    }
+//
+//    private JsonObjectRequest getRouteRequest(final PlaceWithLatLonAndAddress origin, final Result dest){
+//        return new JsonObjectRequest(Request.Method.GET, getRouteUrl(origin,dest), null, new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                RouteReceived routeReceived = new Gson().fromJson(new JsonParser().parse(response.toString()), RouteReceived.class);
+//                ROUTE_MATRIX.put(new Pair<PlaceWithLatLonAndAddress, Result>(origin,dest),routeReceived.getRoutes().get(0));
+//                Log.i(TAG, "onRouteResponse: " + response.toString());
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.e(TAG, "onErrorResponse: ", error);
+//            }
+//        });
+//    }
 
     public void searchRestaurant(View view) {
         if (allLocations != null && allLocations.size() > 0) {
+            ORIGINAL = allLocations;
             RESTAURANT_LIST = new ArrayList<>();
             progressDialog.show();
-            for (PlaceWIthLatLonAndAddress place : allLocations) {
+            for (PlaceWithLatLonAndAddress place : allLocations) {
                 queueCount++;
-                RequestSingleton.getInstance(this).addToRequestQueue(request(getUrl(place)));
+                RequestSingleton.getInstance(this).addToRequestQueue(findRestaurantRequest(place));
             }
         }
 

@@ -50,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0x0011;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
-    private PlaceWIthLatLonAndAddress resLocation;
+    private PlaceWithLatLonAndAddress resLocation;
     private LatLng mDefaultLocation;
     private Marker mapMaker;
     private AutocompleteSupportFragment autoSearch;
@@ -105,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(res, DEFAULT_ZOOM));
                     if (res != null) {
                         mapMaker.setPosition(res);
-                        resLocation = new PlaceWIthLatLonAndAddress(res, place.getName());
+                        resLocation = new PlaceWithLatLonAndAddress(res, place.getName());
                     }
 
                     //Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
@@ -254,7 +254,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             else{
                                 mapMaker.setPosition(currentLocation);
                             }
-                            resLocation = new PlaceWIthLatLonAndAddress(currentLocation, getAddressFromLatLon(currentLocation));
+                            resLocation = new PlaceWithLatLonAndAddress(currentLocation, getAddressFromLatLon(currentLocation));
 /*                            Intent intent = new Intent();
                             Bundle bundle = new Bundle();
                             bundle.putDouble("Latitude", mLastKnownLocation.getLatitude());
@@ -296,7 +296,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         String address = getAddressFromLatLon(latLng);
         autoSearch.setText(address);
-        resLocation = new PlaceWIthLatLonAndAddress(latLng, address);
+        resLocation = new PlaceWithLatLonAndAddress(latLng, address);
     }
 
     private String getAddressFromLatLon(LatLng latLng) {
