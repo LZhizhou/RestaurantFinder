@@ -1,6 +1,8 @@
 package com.restaurantfinder;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -85,6 +87,18 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final Result item = RESTAURANT_LIST.get(position);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri gmmUri = Uri.parse("geo:" + item.getGeometry().getLocation().getLat() + "," + item.getGeometry().getLocation().getLng() +
+                        "?q=" + item.getName() + "," + item.getVicinity());
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, gmmUri);
+                intent.setPackage("com.google.android.apps.maps");
+                context.startActivity(intent);
+
+            }
+        });
 
         holder.nameText.setText(item.getName());
         holder.clearItem.setOnClickListener(new View.OnClickListener() {
@@ -114,8 +128,6 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
             }
             holder.duration.setText(builder.deleteCharAt(builder.length() - 1));
         }
-
-
 
     }
 
@@ -189,12 +201,14 @@ class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolde
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        View itemView;
         TextView nameText;
         ImageButton clearItem;
         RatingBar ratingBar;
         TextView duration;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.itemView = itemView;
             nameText = itemView.findViewById(R.id.restaurant_name);
             clearItem = itemView.findViewById(R.id.clear_item);
             ratingBar = itemView.findViewById(R.id.ratingBar);
