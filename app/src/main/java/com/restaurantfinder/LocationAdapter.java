@@ -45,7 +45,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             });
         } else {
 
-            holder.locationText.setText("Click to add another location");
+            holder.locationText.setText("Click to add new location");
             holder.locationText.setOnClickListener(onClickListener);
             holder.deleteLocationButton.setVisibility(View.GONE);
         }

@@ -1,20 +1,381 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <androidx.recyclerview.widget.RecyclerView
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-        android:id="@+id/all_location_recycle"
-        android:scrollbars="vertical"
+    <ScrollView
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:onClick="searchRestaurant"
-        android:text="find restaurant" />
+        <LinearLayout
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/all_location_recycle"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-</FrameLayout>
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Hours"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Hours_open_now"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Hours_open_now"
+                    android:textOn="@string/Hours_open_now" />
+
+                <ToggleButton
+                    android:id="@+id/Hours_any_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Hours_any_time"
+                    android:textOn="@string/Hours_any_time" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Cuisine"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_select_all"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_select_all"
+                    android:textOn="@string/Cuisine_select_all" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_chinese"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_chinese"
+                    android:textOn="@string/Cuisine_chinese" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_french"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_french"
+                    android:textOn="@string/Cuisine_french" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_hamburger"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_hamburger"
+                    android:textOn="@string/Cuisine_hamburger" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_indian"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_indian"
+                    android:textOn="@string/Cuisine_indian" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_italian"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_italian"
+                    android:textOn="@string/Cuisine_italian" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_japanese"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_japanese"
+                    android:textOn="@string/Cuisine_japanese" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_maxican"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_maxican"
+                    android:textOn="@string/Cuisine_maxican" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_middle_eastern"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+
+                    android:singleLine="true"
+
+                    android:textOff="@string/Cuisine_middle_eastern"
+                    android:textOn="@string/Cuisine_middle_eastern" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_pizza"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_pizza"
+                    android:textOn="@string/Cuisine_pizza" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_seafood"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_seafood"
+                    android:textOn="@string/Cuisine_seafood" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_sushi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_sushi"
+                    android:textOn="@string/Cuisine_sushi" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_thai"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_thai"
+                    android:textOn="@string/Cuisine_thai" />
+
+                <ToggleButton
+                    android:id="@+id/Cuisine_vietnamese"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Cuisine_vietnamese"
+                    android:textOn="@string/Cuisine_vietnamese" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Mode"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Mode_bus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Mode_bus"
+                    android:textOn="@string/Mode_bus" />
+
+                <ToggleButton
+                    android:id="@+id/Mode_subway"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Mode_subway"
+                    android:textOn="@string/Mode_subway" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Mode_train"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Mode_train"
+                    android:textOn="@string/Mode_train" />
+
+                <ToggleButton
+                    android:id="@+id/Mode_tram_light_rail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Mode_tram_light_rail"
+                    android:textOn="@string/Mode_tram_light_rail" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:text="@string/Route"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Route_best"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Route_best"
+                    android:textOn="@string/Route_best" />
+
+                <ToggleButton
+                    android:id="@+id/Route_fewer_transfers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Route_fewer_transfers"
+                    android:textOn="@string/Route_fewer_transfers" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/Route_less_walking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:textOff="@string/Route_less_walking"
+                    android:textOn="@string/Route_less_walking" />
+
+                <ToggleButton
+                    android:id="@+id/Route_wheelchair"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+
+                    android:singleLine="true"
+
+                    android:textOff="@string/Route_wheelchair"
+                    android:textOn="@string/Route_wheelchair" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="32sp"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom"
+                android:onClick="searchRestaurant"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:text="Search for Restaurants" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
